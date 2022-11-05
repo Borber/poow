@@ -11,4 +11,4 @@ Cargo.lock
 
 # sqlite 数据库文件 后续将自动生成
 
-/src/db
+/db
