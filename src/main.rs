@@ -1,12 +1,12 @@
-mod config;
 mod util;
+mod conf;
 
 use anyhow::Result;
 
 use actix_web::{get, web, App, HttpServer, Responder};
 use tracing::info;
 
-use crate::config::G_CONF;
+use crate::conf::G_CONF;
 use crate::util::banner;
 
 #[get("/{name}")]
