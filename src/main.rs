@@ -1,11 +1,13 @@
 mod config;
+mod util;
 
 use anyhow::Result;
 
 use actix_web::{get, web, App, HttpServer, Responder};
 use tracing::info;
 
-use crate::config::Conf;
+use crate::config::G_CONF;
+use crate::util::banner;
 
 #[get("/{name}")]
 async fn greet(name: web::Path<String>) -> impl Responder {
@@ -14,17 +16,16 @@ async fn greet(name: web::Path<String>) -> impl Responder {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    banner::show();
     tracing_subscriber::fmt::init();
     info!("日志模块初始化成功");
-    Conf::init_conf();
-    info!("全局配置导入成功");
     let server = HttpServer::new(|| App::new().service(greet))
-        .bind(format!("{}:{}", Conf::global().ip, Conf::global().port))?
+        .bind(format!("{}:{}", G_CONF.ip, G_CONF.port))?
         // disable default signal handling
         .disable_signals()
         .run();
     info!("网络模块初始化成功");
-    info!("绑定地址: {}:{}", Conf::global().ip, Conf::global().port);
+    info!("绑定地址: {}:{}", G_CONF.ip, G_CONF.port);
 
     let server_handle = server.handle();
 
@@ -39,6 +40,7 @@ async fn main() -> Result<()> {
         info!("服务成功终止");
     });
 
+    info!("启动服务");
     let _ = tokio::try_join!(server_task, shutdown).expect("添加任务失败");
 
     Ok(())
